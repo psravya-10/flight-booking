@@ -35,11 +35,24 @@ public class FlightServiceImpl implements FlightService {
     @Override
     public Long addInventory(AirlineInventoryRequest req) {
 
+    	// 1. Check airline exists or create new
         Airline airline = airlineRepo.findByNameIgnoreCase(req.getAirlineName())
                 .orElseGet(() -> airlineRepo.save(
-                		new Airline(null, req.getAirlineName())
-
+                        new Airline(null, req.getAirlineName())
                 ));
+
+        // 2. DUPLICATE CHECK  
+        Optional<Flight> existingFlight = flightRepo
+                .findByAirlineAndFromPlaceIgnoreCaseAndToPlaceIgnoreCaseAndDepartureTime(
+                        airline,
+                        req.getFromPlace(),
+                        req.getToPlace(),
+                        req.getDepartureTime()
+                );
+
+        if (existingFlight.isPresent()) {
+            throw new BadRequestException("Flight already exists for this airline and schedule");
+        }
 
         Flight flight = new Flight();
         flight.setAirline(airline);

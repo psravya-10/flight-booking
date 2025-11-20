@@ -56,9 +56,9 @@ public class FlightController {
     }
 
     @DeleteMapping("/booking/cancel/{pnr}")
-    public ResponseEntity<Void> cancel(@PathVariable String pnr) {
+    public ResponseEntity<String> cancel(@PathVariable String pnr) {
         log.debug("Cancel ticket");
         service.cancelTicket(pnr);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Ticket cancelled successfully");
     }
 }
